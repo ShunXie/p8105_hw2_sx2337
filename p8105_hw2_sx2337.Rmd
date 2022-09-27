@@ -9,3 +9,97 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+```{r}
+#load all the data
+library(tidyverse)
+options(tibble.print_min = 5)
+```
+
+
+# Problem 1
+NYC_Transit_Subway_Entrance_And_Exit_Data is the dataset that includes all the NYC transit data. First, clean the data:
+
+```{r}
+NYC_transit = 
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  janitor::clean_names() %>%
+  select(line, station_name, station_latitude:entry, vending, ada) %>%
+  mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
+head(NYC_transit)
+```
+
+The original data set contains 33 varibles, namely: Division,	Line,	Station Name,	Station Latitude,	Station Longitude,	Route1,	Route2,	Route3,	Route4,	Route5,	Route6,	Route7,	Route8,	Route9,	Route10,	Route11,	Entrance Type,	Entry,	Exit Only,	Vending,	Staffing,	Staff Hours,	ADA,	ADA Notes,	Free Crossover,	North South Street,	East West Street,	Corner,	Entrance Latitude,	Entrance Longitude,	Station Location and	Entrance Location. Out of these variables, I selected the required variables for line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance.
+
+For data cleaning, I first clean the names of data using janitor package, then select the required variables and change the entry variable from character to logical variables. The resulting data is shown above. The data is not exactly very tidy because there are a total of 11 route variables that could be merge using pivot_longer function. Additionally, the variable names are not all characters. Some of the variables are double. 
+
+
+Now here is the answer to 3 questions:
+
+1. How many distinct stations are there?
+```{r}
+distinct_station = distinct(NYC_transit, NYC_transit$line,NYC_transit$station_name,.keep_all=TRUE)
+num_distinct_station = nrow(distinct_station)
+print(num_distinct_station)
+```
+First I use distinct function to find distinct pair of station name and line. Note when keep_all=TRUE, all the variables in the dataframe will be kept but with only distinct pair of station name and line. Then I use nrow function to return the total number of row. 
+There are a total of 465 distinct stations.
+
+2. How many stations are ADA compliant?
+```{r}
+num_ADA = filter(distinct_station,ada==TRUE) %>%
+  length()
+print(num_ADA)
+```
+First I filter and left all the station that is ada compliant. Then I use length function to return the number of values left. 
+There are a total of 21 station that is ada compliant.
+
+3. What proportion of station entrances / exits without vending allow entrance?
+```{r}
+num_no_vending = filter(NYC_transit, vending=='NO') %>%
+  nrow()
+num_total = nrow(NYC_transit)
+proportion_without_vending = num_no_vending/num_total
+print(proportion_without_vending)
+```
+First I filter all the station entrances/ exits without vending and get the number by using nrow(). Then I get the total number of station entrances/exits. 
+The proportion is 0.098 (3d.p.)
+
+
+Now reform the data first by tidy up the variable name of route into characters.
+```{r}
+NYC_transit_adpt = mutate(NYC_transit,across(route1:route11, as.character))
+```
+
+Then, first get the reform data so that route number and route name are distinct variables. 
+```{r}
+reform_NYC_transit = 
+pivot_longer(NYC_transit_adpt,
+    route1:route11,
+    names_to = "route_number", 
+    values_to = "route_name",
+    values_drop_na = TRUE)
+reform_NYC_transit
+```
+
+To answer the question of How many distinct stations serve the A train, I need to first filter the stations that serve A train and then return all the distinct stations by distinct function. Lastly, get the number by nrow()
+
+```{r}
+distinct_station_A = filter(reform_NYC_transit,route_name=='A') %>%
+  distinct( line,station_name,.keep_all=TRUE) 
+
+print(nrow(distinct_station_A))
+```
+There are 60 distinct stations serve the A train. 
+
+```{r}
+num_ADA_distinct_station_A = filter(distinct_station_A,ada=='TRUE') %>%
+  nrow()
+print(num_ADA_distinct_station_A)
+```
+By filtering all ada compliant from the distinct stations serve the A train and return the number by using nrow, there are 17 station are ADA compliant.
+
+
+
+# Problem 2
+
