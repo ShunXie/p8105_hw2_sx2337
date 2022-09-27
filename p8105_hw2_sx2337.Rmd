@@ -1,0 +1,11 @@
+---
+title: "p8105_hw2_sx2337"
+author: "Shun Xie"
+date: "2022-09-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
