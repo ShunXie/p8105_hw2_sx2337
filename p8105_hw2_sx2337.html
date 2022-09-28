@@ -511,57 +511,56 @@ compliant.</p>
 <p>First, load the data. The first line of the data is a logo, in which
 need to skip it. Also do not include the last several columns by
 specifying the columns that need to be included in the range argument in
-read_excel. Then change the variable name of weight (tons) to weight and
-Volume (cubic yards) to volume. Also change other variable names into a
-lower case character that two words are seperated by underline. After
-that, ommit rows that does not include dumpster-specific data using
-drop_na function. The last row contains grand total will also be
-excluded by using filter function filters all rows except for the last
-row. Lastly, round the number of sports balls to the nearest integer and
-converts the result to an integer variable.</p>
+read_excel. After clean the names, change the variable name of
+weight_tons to weight and Volume_cubic_yards to volume. After that,
+ommit rows that does not include dumpster-specific data using drop_na
+function. The last row contains grand total will also be excluded by
+using filter function filters all rows except for the last row. Lastly,
+round the number of sports balls to the nearest integer and converts the
+result to an integer variable.</p>
 <pre class="r"><code>Mr_trash_wheel = 
   readxl::read_excel(&quot;./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx&quot;,skip = 1,sheet=1,range = cellranger::cell_cols(&quot;A:N&quot;))  %&gt;%
-  select(Dumpster=Dumpster, weight = `Weight (tons)`,volume = `Volume (cubic yards)`,plastic_bottle = `Plastic Bottles`, cigarette_butts = `Cigarette Butts`,glass_bottles=`Glass Bottles`, grocery_bags=`Grocery Bags`, chip_bags = `Chip Bags`, sports_balls=`Sports Balls`,home_powered = `Homes Powered*`, everything())%&gt;%
-  drop_na(Dumpster) %&gt;%
+  janitor::clean_names() %&gt;%
+  select(dumpster=dumpster, weight = weight_tons,volume = volume_cubic_yards,everything())%&gt;%
+  drop_na(dumpster) %&gt;%
   filter(row_number()!=n())%&gt;%
   mutate(sports_balls = as.integer(sports_balls))
   
 head(Mr_trash_wheel)</code></pre>
 <pre><code>## # A tibble: 6 × 14
-##   Dumpster weight volume plast…¹ cigar…² glass…³ groce…⁴ chip_…⁵ sport…⁶ home_…⁷
-##   &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;int&gt;   &lt;dbl&gt;
-## 1 1          4.31     18    1450  126000      72     584    1162       7       0
-## 2 2          2.74     13    1120   91000      42     496     874       5       0
-## 3 3          3.45     15    2450  105000      50    1080    2032       6       0
-## 4 4          3.1      15    2380  100000      52     896    1971       6       0
-## 5 5          4.06     18     980  120000      72     368     753       7       0
-## 6 6          2.71     13    1430   90000      46     672    1144       5       0
-## # … with 4 more variables: Month &lt;chr&gt;, Year &lt;dbl&gt;, Date &lt;dttm&gt;,
-## #   Polystyrene &lt;dbl&gt;, and abbreviated variable names ¹​plastic_bottle,
-## #   ²​cigarette_butts, ³​glass_bottles, ⁴​grocery_bags, ⁵​chip_bags, ⁶​sports_balls,
-## #   ⁷​home_powered</code></pre>
+##   dumpster weight volume month  year date                plast…¹ polys…² cigar…³
+##   &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dttm&gt;                &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 1          4.31     18 May    2014 2014-05-16 00:00:00    1450    1820  126000
+## 2 2          2.74     13 May    2014 2014-05-16 00:00:00    1120    1030   91000
+## 3 3          3.45     15 May    2014 2014-05-16 00:00:00    2450    3100  105000
+## 4 4          3.1      15 May    2014 2014-05-17 00:00:00    2380    2730  100000
+## 5 5          4.06     18 May    2014 2014-05-17 00:00:00     980     870  120000
+## 6 6          2.71     13 May    2014 2014-05-20 00:00:00    1430    2140   90000
+## # … with 5 more variables: glass_bottles &lt;dbl&gt;, grocery_bags &lt;dbl&gt;,
+## #   chip_bags &lt;dbl&gt;, sports_balls &lt;int&gt;, homes_powered &lt;dbl&gt;, and abbreviated
+## #   variable names ¹​plastic_bottles, ²​polystyrene, ³​cigarette_butts</code></pre>
 <p>Now do the similar process to Professor Trash Wheel.</p>
 <pre class="r"><code>Prof_trash_wheel = 
   readxl::read_excel(&quot;./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx&quot;,skip = 1,sheet=2,range = cellranger::cell_cols(&quot;A:N&quot;))  %&gt;%
-  select(Dumpster=Dumpster, weight = `Weight (tons)`,volume = `Volume (cubic yards)`,plastic_bottle = `Plastic Bottles`, cigarette_butts = `Cigarette Butts`,glass_bottles=`Glass Bottles`, grocery_bags=`Grocery Bags`, chip_bags = `Chip Bags`, sports_balls=`Sports Balls`,home_powered = `Homes Powered*`, everything())%&gt;%
-  drop_na(Dumpster) %&gt;%
+  janitor::clean_names() %&gt;%
+  select(dumpster=dumpster, weight = weight_tons,volume = volume_cubic_yards,everything())%&gt;%
+  drop_na(dumpster) %&gt;%
   filter(row_number()!=n())%&gt;%
   mutate(sports_balls = as.integer(sports_balls))
   
 head(Prof_trash_wheel)</code></pre>
 <pre><code>## # A tibble: 6 × 14
-##   Dumpster weight volume plast…¹ cigar…² glass…³ groce…⁴ chip_…⁵ sport…⁶ home_…⁷
-##      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;int&gt;   &lt;dbl&gt;
-## 1        1   1.79     15    1950   19700       8    3100   15600       7    29.8
-## 2        2   1.58     15    9540   17600      14    5630   16700       0    26.3
-## 3        3   2.32     18    8350   12000      19    6430   12400       0    38.7
-## 4        4   3.72     15    8590   13000      21    5870   11030       0    62  
-## 5        5   1.45     15    7830   16000      18    7450   15340       0    24.2
-## 6        6   1.71     15    8210   14000      23    9560   13470       0    28.5
-## # … with 4 more variables: Month &lt;chr&gt;, Year &lt;dbl&gt;, Date &lt;dttm&gt;,
-## #   Polystyrene &lt;dbl&gt;, and abbreviated variable names ¹​plastic_bottle,
-## #   ²​cigarette_butts, ³​glass_bottles, ⁴​grocery_bags, ⁵​chip_bags, ⁶​sports_balls,
-## #   ⁷​home_powered</code></pre>
+##   dumpster weight volume month  year date                plast…¹ polys…² cigar…³
+##      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dttm&gt;                &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1        1   1.79     15 Janu…  2017 2017-01-02 00:00:00    1950    6080   19700
+## 2        2   1.58     15 Janu…  2017 2017-01-30 00:00:00    9540   11230   17600
+## 3        3   2.32     18 Febr…  2017 2017-02-26 00:00:00    8350    9210   12000
+## 4        4   3.72     15 Febr…  2017 2017-02-26 00:00:00    8590    1030   13000
+## 5        5   1.45     15 Febr…  2017 2017-02-28 00:00:00    7830    9950   16000
+## 6        6   1.71     15 March  2017 2017-03-30 00:00:00    8210   10340   14000
+## # … with 5 more variables: glass_bottles &lt;dbl&gt;, grocery_bags &lt;dbl&gt;,
+## #   chip_bags &lt;dbl&gt;, sports_balls &lt;int&gt;, homes_powered &lt;dbl&gt;, and abbreviated
+## #   variable names ¹​plastic_bottles, ²​polystyrene, ³​cigarette_butts</code></pre>
 <p>First, add two columns specifying the dataset is Mr or Prof. Then
 join two dataframes vertically using rbind:</p>
 <pre class="r"><code>Mr_trash_wheel = mutate(Mr_trash_wheel, Mr_or_prof = &#39;Mr&#39;)
@@ -578,14 +577,36 @@ dumpsters, measuring in cubic yards. The average volume of each dumpster
 is <code>15.3021033</code>. For the data collected by Mr Trash wheel,
 the average volume is <code>15.4128035</code> cubic yards whereas Prof
 Trash wheel has an average of <code>14.5857143</code> cubic yards.</p>
-<p>The dataset also measures number of plastic bottles, cigeratte butts,
+<p>The dataset also measures number of plastic bottles, cigarette butts,
 glass bottles, grocery bags, chip bags and sports balls. The average of
-the above variables is: <code>NA</code>, <code>NA</code>,
-<code>21.0305927</code>, <code>1394.8680688</code>,
-<code>2575.2122371</code>, <code>10.1854685</code> respectively.</p>
+the above variables is: <code>2411.206501</code>,
+<code>2.3142826\times 10^{4}</code>, <code>21.0305927</code>,
+<code>1394.8680688</code>, <code>2575.2122371</code>,
+<code>10.1854685</code> respectively.</p>
 <p>The total weight of trash collected by Professor Trash Wheel is
 <code>133.82</code> tons. The total number of sports balls collected by
 Mr. Trash Wheel in 2020 is <code>856</code></p>
+</div>
+<div id="problem-3" class="section level1">
+<h1>Problem 3</h1>
+<p>First, read the dataset. Then separate the mon variable into
+variables year month and day. As instructed, these variables need to be
+in integers. Therefore, use mutate function to convert all values in the
+variables into integers. After that, convert month into month name using
+moth.abb function in r. Then, create a president variable</p>
+<pre class="r"><code>pols_month = read_csv(&quot;./data/fivethirtyeight_datasets/pols-month.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;%
+  separate(mon,c(&#39;year&#39;,&#39;month&#39;,&#39;day&#39;),sep=&#39;-&#39;) %&gt;%
+  mutate(year = as.integer(year), month = as.integer(month), day = as.integer(day)) %&gt;%
+  mutate(month = month.abb[month]) </code></pre>
+<pre><code>## Rows: 822 Columns: 9
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## dbl  (8): prez_gop, gov_gop, sen_gop, rep_gop, prez_dem, gov_dem, sen_dem, r...
+## date (1): mon
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
 
 

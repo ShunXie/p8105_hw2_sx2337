@@ -102,12 +102,13 @@ By filtering all ada compliant from the distinct stations serve the A train and 
 
 
 # Problem 2
-First, load the data. The first line of the data is a logo, in which need to skip it. Also do not include the last several columns by specifying the columns that need to be included in the range argument in read_excel. Then change the variable name of weight (tons) to weight and Volume (cubic yards) to volume. Also change other variable names into a lower case character that two words are seperated by underline. After that, ommit rows that does not include dumpster-specific data using drop_na function. The last row contains grand total will also be excluded by using filter function filters all rows except for the last row. Lastly, round the number of sports balls to the nearest integer and converts the result to an integer variable.
+First, load the data. The first line of the data is a logo, in which need to skip it. Also do not include the last several columns by specifying the columns that need to be included in the range argument in read_excel. After clean the names, change the variable name of weight_tons to weight and Volume_cubic_yards to volume. After that, ommit rows that does not include dumpster-specific data using drop_na function. The last row contains grand total will also be excluded by using filter function filters all rows except for the last row. Lastly, round the number of sports balls to the nearest integer and converts the result to an integer variable.
 ```{r}
 Mr_trash_wheel = 
   readxl::read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",skip = 1,sheet=1,range = cellranger::cell_cols("A:N"))  %>%
-  select(Dumpster=Dumpster, weight = `Weight (tons)`,volume = `Volume (cubic yards)`,plastic_bottle = `Plastic Bottles`, cigarette_butts = `Cigarette Butts`,glass_bottles=`Glass Bottles`, grocery_bags=`Grocery Bags`, chip_bags = `Chip Bags`, sports_balls=`Sports Balls`,home_powered = `Homes Powered*`, everything())%>%
-  drop_na(Dumpster) %>%
+  janitor::clean_names() %>%
+  select(dumpster=dumpster, weight = weight_tons,volume = volume_cubic_yards,everything())%>%
+  drop_na(dumpster) %>%
   filter(row_number()!=n())%>%
   mutate(sports_balls = as.integer(sports_balls))
   
@@ -120,8 +121,9 @@ Now do the similar process to Professor Trash Wheel.
 ```{r}
 Prof_trash_wheel = 
   readxl::read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",skip = 1,sheet=2,range = cellranger::cell_cols("A:N"))  %>%
-  select(Dumpster=Dumpster, weight = `Weight (tons)`,volume = `Volume (cubic yards)`,plastic_bottle = `Plastic Bottles`, cigarette_butts = `Cigarette Butts`,glass_bottles=`Glass Bottles`, grocery_bags=`Grocery Bags`, chip_bags = `Chip Bags`, sports_balls=`Sports Balls`,home_powered = `Homes Powered*`, everything())%>%
-  drop_na(Dumpster) %>%
+  janitor::clean_names() %>%
+  select(dumpster=dumpster, weight = weight_tons,volume = volume_cubic_yards,everything())%>%
+  drop_na(dumpster) %>%
   filter(row_number()!=n())%>%
   mutate(sports_balls = as.integer(sports_balls))
   
@@ -138,13 +140,21 @@ merged_df = rbind(Mr_trash_wheel,Prof_trash_wheel)
 
 The data has a total of ```r nrow(merged_df)``` number of time that trash is collected and dumped into a dumpster after combining Mr_trash_wheel and Prof_trash_wheel. The key variables are the weight of dumpster measuring in tons and the average of each dumpster weights ```r mean(merged_df$weight)```. For the data collected by Mr Trash wheel, the average weight is ```r mean(filter(merged_df,Mr_or_prof=='Mr')$weight)``` tons whereas Prof Trash wheel has an average of ```r mean(filter(merged_df,Mr_or_prof=='Prof')$weight)``` tons. Another important factor is the volume of dumpsters, measuring in cubic yards. The average volume of each dumpster is  ```r mean(merged_df$volume)```. For the data collected by Mr Trash wheel, the average volume is ```r mean(filter(merged_df,Mr_or_prof=='Mr')$volume)``` cubic yards whereas Prof Trash wheel has an average of ```r mean(filter(merged_df,Mr_or_prof=='Prof')$volume)``` cubic yards. 
 
-The dataset also measures number of plastic bottles, cigeratte butts, glass bottles, grocery bags, chip bags and sports balls. The average of the above variables is: ```r mean(merged_df$plastic_bottles)```, ```r mean(merged_df$cigeratte_butts)```, ```r mean(merged_df$glass_bottles)```, ```r mean(merged_df$grocery_bags)```, ```r mean(merged_df$chip_bags)```, ```r mean(merged_df$sports_balls)``` respectively. 
+The dataset also measures number of plastic bottles, cigarette butts, glass bottles, grocery bags, chip bags and sports balls. The average of the above variables is: ```r mean(merged_df$plastic_bottles)```, ```r mean(merged_df$cigarette_butts)```, ```r mean(merged_df$glass_bottles)```, ```r mean(merged_df$grocery_bags)```, ```r mean(merged_df$chip_bags)```, ```r mean(merged_df$sports_balls)``` respectively. 
 
 
 The total weight of trash collected by Professor Trash Wheel is ```r sum(filter(merged_df,Mr_or_prof=='Prof')$weight)``` tons. 
-The total number of sports balls collected by Mr. Trash Wheel in 2020 is ```r sum(filter(merged_df,Mr_or_prof=='Mr',Year == 2020)$sports_balls)```
+The total number of sports balls collected by Mr. Trash Wheel in 2020 is ```r sum(filter(merged_df,Mr_or_prof=='Mr', year == 2020)$sports_balls)```
 
 
 
 # Problem 3
+First, read the dataset. Then separate the mon variable into variables year month and day. As instructed, these variables need to be in integers. Therefore, use mutate function to convert all values in the variables into integers. After that, convert month into month name using moth.abb function in r. Then, create a president variable 
+```{r}
+pols_month = read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>% 
+  janitor::clean_names() %>%
+  separate(mon,c('year','month','day'),sep='-') %>%
+  mutate(year = as.integer(year), month = as.integer(month), day = as.integer(day)) %>%
+  mutate(month = month.abb[month]) 
+```
 
