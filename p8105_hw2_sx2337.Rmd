@@ -141,3 +141,8 @@ The data has a total of ```r nrow(merged_df)``` number of time that trash is col
 The dataset also measures number of plastic bottles, cigeratte butts, glass bottles, grocery bags, chip bags and sports balls. The average of the above variables is: ```r mean(merged_df$plastic_bottles)```, ```r mean(merged_df$cigeratte_butts)```, ```r mean(merged_df$glass_bottles)```, ```r mean(merged_df$grocery_bags)```, ```r mean(merged_df$chip_bags)```, ```r mean(merged_df$sports_balls)``` respectively. 
 
 
+The total weight of trash collected by Professor Trash Wheel is ```r sum(filter(merged_df,Mr_or_prof=='Prof')$weight)``` tons. 
+The total number of sports balls collected by Mr. Trash Wheel in 2020 is ```r sum(filter(merged_df,Mr_or_prof=='Mr',Year == 2020)$sports_balls)```
+
+
+
