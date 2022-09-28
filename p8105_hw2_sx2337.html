@@ -386,20 +386,11 @@ library(tidyverse)</code></pre>
 <p>NYC_Transit_Subway_Entrance_And_Exit_Data is the dataset that
 includes all the NYC transit data. First, clean the data:</p>
 <pre class="r"><code>NYC_transit = 
-  read_csv(&quot;./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv&quot;) %&gt;%
+  read_csv(&quot;./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv&quot;,show_col_types = FALSE) %&gt;%
   janitor::clean_names() %&gt;%
   select(line, station_name, station_latitude:entry, vending, ada) %&gt;%
-  mutate(entry = recode(entry, &quot;YES&quot; = TRUE, &quot;NO&quot; = FALSE))</code></pre>
-<pre><code>## Rows: 1868 Columns: 32
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (22): Division, Line, Station Name, Route1, Route2, Route3, Route4, Rout...
-## dbl  (8): Station Latitude, Station Longitude, Route8, Route9, Route10, Rout...
-## lgl  (2): ADA, Free Crossover
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>head(NYC_transit)</code></pre>
+  mutate(entry = recode(entry, &quot;YES&quot; = TRUE, &quot;NO&quot; = FALSE))
+head(NYC_transit)</code></pre>
 <pre><code>## # A tibble: 6 × 19
 ##   line  stati…¹ stati…² stati…³ route1 route2 route3 route4 route5 route6 route7
 ##   &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; 
@@ -509,15 +500,15 @@ compliant.</p>
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
 <p>First, load the data. The first line of the data is a logo, in which
-need to skip it. Also do not include the last several columns by
-specifying the columns that need to be included in the range argument in
-read_excel. After clean the names, change the variable name of
-weight_tons to weight and Volume_cubic_yards to volume. After that,
-ommit rows that does not include dumpster-specific data using drop_na
-function. The last row contains grand total will also be excluded by
-using filter function filters all rows except for the last row. Lastly,
-round the number of sports balls to the nearest integer and converts the
-result to an integer variable.</p>
+need to skip it. Also exclude the last several columns by specifying the
+columns that need to be included in the range argument in read_excel.
+After clean the names, change the variable name of weight_tons to weight
+and Volume_cubic_yards to volume. After that, ommit rows that does not
+include dumpster-specific data using drop_na function. The last row
+contains grand total will also be excluded by using filter function
+filters all rows except for the last row. Lastly, round the number of
+sports balls to the nearest integer and converts the result to an
+integer variable.</p>
 <pre class="r"><code>Mr_trash_wheel = 
   readxl::read_excel(&quot;./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx&quot;,skip = 1,sheet=1,range = cellranger::cell_cols(&quot;A:N&quot;))  %&gt;%
   janitor::clean_names() %&gt;%
@@ -589,24 +580,115 @@ Mr. Trash Wheel in 2020 is <code>856</code></p>
 </div>
 <div id="problem-3" class="section level1">
 <h1>Problem 3</h1>
-<p>First, read the dataset. Then separate the mon variable into
-variables year month and day. As instructed, these variables need to be
-in integers. Therefore, use mutate function to convert all values in the
-variables into integers. After that, convert month into month name using
-moth.abb function in r. Then, create a president variable</p>
-<pre class="r"><code>pols_month = read_csv(&quot;./data/fivethirtyeight_datasets/pols-month.csv&quot;) %&gt;% 
+<ol style="list-style-type: decimal">
+<li>Read the dataset</li>
+<li>Clean the names.</li>
+<li>Separate the mon variable into variables year month and day.</li>
+<li>As instructed, these variables need to be in integers. Therefore,
+use mutate function to convert all values in the variables into
+integers.</li>
+<li>After that, convert month into month name using moth.abb function in
+r.</li>
+<li>Then, create a president variable containing a classification of
+‘dem’ or ‘goz’. If prez_dem==1, the president is democratic, otherwise
+the president is republican and must have prez_dem==1. Therefore, I can
+use ifelse function to check if presidence is gop or dem.<br />
+</li>
+<li>Follows the last step, I remove the columns of prez_dem and prez_gop
+using select function.</li>
+<li>Also remove the day variable in the last step.</li>
+</ol>
+<pre class="r"><code>pols_month = read_csv(&quot;./data/fivethirtyeight_datasets/pols-month.csv&quot;,show_col_types = FALSE) %&gt;% 
   janitor::clean_names() %&gt;%
   separate(mon,c(&#39;year&#39;,&#39;month&#39;,&#39;day&#39;),sep=&#39;-&#39;) %&gt;%
   mutate(year = as.integer(year), month = as.integer(month), day = as.integer(day)) %&gt;%
-  mutate(month = month.abb[month]) </code></pre>
-<pre><code>## Rows: 822 Columns: 9
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## dbl  (8): prez_gop, gov_gop, sen_gop, rep_gop, prez_dem, gov_dem, sen_dem, r...
-## date (1): mon
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+  mutate(month = month.abb[month]) %&gt;%
+  mutate(president = ifelse(prez_dem==1,&#39;dem&#39;,&#39;gop&#39;)) %&gt;%
+  select(-prez_dem,-prez_gop) %&gt;%
+  select(-day)
+head(pols_month)</code></pre>
+<pre><code>## # A tibble: 6 × 9
+##    year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem president
+##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;    
+## 1  1947 Jan        23      51     253      23      45     198 dem      
+## 2  1947 Feb        23      51     253      23      45     198 dem      
+## 3  1947 Mar        23      51     253      23      45     198 dem      
+## 4  1947 Apr        23      51     253      23      45     198 dem      
+## 5  1947 May        23      51     253      23      45     198 dem      
+## 6  1947 Jun        23      51     253      23      45     198 dem</code></pre>
+<p>Now move on to cleaning the data in snp.csv with similar procedure:
+1. Read the data 2. Clean variable name 3. Seperate date into month day
+year 4. Get into integer values 5. If year is smaller than 22, it means
+year is from 2000 to 2022, thus, add 2000 to the year value. If it is
+bigger than 22, i.e. 50, it means it is year 1950. Hence add 1900 if
+year is bigger than 22. Use ifelse function to do so 6. Get month into
+month name 7. Get rid of column of day 8. Organize so that year and
+month are leading columns</p>
+<pre class="r"><code>snp = read_csv(&quot;./data/fivethirtyeight_datasets/snp.csv&quot;,show_col_types = FALSE) %&gt;% 
+  janitor::clean_names() %&gt;%
+  separate(date,c(&#39;month&#39;,&#39;day&#39;,&#39;year&#39;),sep=&#39;/&#39;) %&gt;%
+  mutate(year = as.integer(year), month = as.integer(month), day = as.integer(day)) %&gt;%
+  mutate(year = ifelse(year&lt;22,year+2000,year+1900))%&gt;%
+  mutate(month = month.abb[month]) %&gt;%
+  select(-day)%&gt;%
+  select(year, month, everything())
+head(snp)</code></pre>
+<pre><code>## # A tibble: 6 × 3
+##    year month close
+##   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
+## 1  2015 Jul   2080.
+## 2  2015 Jun   2063.
+## 3  2015 May   2107.
+## 4  2015 Apr   2086.
+## 5  2015 Mar   2068.
+## 6  2015 Feb   2104.</code></pre>
+<p>For unemployment data: The unemployment data has months in seperate
+columns with respect to years. It needs to be convert into long format:
+1. load the data 2. All the data name are in desired form but need to
+convert Year to lower case year 3. Convert into long format</p>
+<pre class="r"><code>unemployment = read_csv(&quot;./data/fivethirtyeight_datasets/unemployment.csv&quot;,show_col_types = FALSE) %&gt;%
+  select(year = Year, everything())%&gt;%
+  pivot_longer(Jan:Dec,names_to = &quot;month&quot;, values_to = &quot;unemployment&quot;)</code></pre>
+<p>Now join the snp into pols. So pols are the dataframe that need to
+contain all the values. Then join unemployment into pols_snp, so
+pols_snp contains all the values.</p>
+<pre class="r"><code>pols_snp = left_join(pols_month,snp,by = c(&quot;year&quot;, &quot;month&quot;))
+pols_snp_unemployment = left_join(pols_snp,unemployment,by = c(&quot;year&quot;, &quot;month&quot;))
+head(pols_snp_unemployment)</code></pre>
+<pre><code>## # A tibble: 6 × 11
+##    year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem president close
+##   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
+## 1  1947 Jan        23      51     253      23      45     198 dem          NA
+## 2  1947 Feb        23      51     253      23      45     198 dem          NA
+## 3  1947 Mar        23      51     253      23      45     198 dem          NA
+## 4  1947 Apr        23      51     253      23      45     198 dem          NA
+## 5  1947 May        23      51     253      23      45     198 dem          NA
+## 6  1947 Jun        23      51     253      23      45     198 dem          NA
+## # … with 1 more variable: unemployment &lt;dbl&gt;</code></pre>
+<p>Dataset pols_month contains all the information related to whether
+president was republican or democratic. It also contains the number of
+governors, senators and representatives in each party. The total
+dimension is <code>822</code> with <code>9</code> variables after
+tidying data. The range of year is from <code>1947</code> to
+<code>2015</code>.</p>
+<p>snp, on the other hand, contains the closing values of stock market
+index on the association date. The total dimension for snp is
+<code>787</code> and there are only <code>3</code> variables after
+tidying data, including year and month. The values of stock market index
+ranging from year <code>1950</code> to <code>2015</code>.</p>
+<p>Unemployment contains the unemployment rate with respect to different
+months in different years, ranging from year <code>1948</code> to
+<code>2015</code>. There are <code>816</code> number of data and
+<code>3</code> of variables including year and month.</p>
+<p>Now the merged dataset includes all three datasets, namely
+pols_month, snp and unemployment. The resulting data has the same
+dimension as pols_month data but with a wider range of variables. It has
+a total of <code>11</code> variables, namely year and month as the key
+and 6 measurement of number of governors, senators and representatives
+with respect to each party, 1 variable of president measuring whether
+the president from democrative or republican, closing values of stock
+market index and unemployment. Although with some missing value, the
+year is from <code>1947</code> to <code>2015</code>.</p>
 </div>
 
 

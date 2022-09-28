@@ -20,9 +20,9 @@ options(tibble.print_min = 5)
 # Problem 1
 NYC_Transit_Subway_Entrance_And_Exit_Data is the dataset that includes all the NYC transit data. First, clean the data:
 
-```{r}
+```{r,warning=FALSE}
 NYC_transit = 
-  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",show_col_types = FALSE) %>%
   janitor::clean_names() %>%
   select(line, station_name, station_latitude:entry, vending, ada) %>%
   mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
@@ -102,7 +102,7 @@ By filtering all ada compliant from the distinct stations serve the A train and 
 
 
 # Problem 2
-First, load the data. The first line of the data is a logo, in which need to skip it. Also do not include the last several columns by specifying the columns that need to be included in the range argument in read_excel. After clean the names, change the variable name of weight_tons to weight and Volume_cubic_yards to volume. After that, ommit rows that does not include dumpster-specific data using drop_na function. The last row contains grand total will also be excluded by using filter function filters all rows except for the last row. Lastly, round the number of sports balls to the nearest integer and converts the result to an integer variable.
+First, load the data. The first line of the data is a logo, in which need to skip it. Also exclude the last several columns by specifying the columns that need to be included in the range argument in read_excel. After clean the names, change the variable name of weight_tons to weight and Volume_cubic_yards to volume. After that, ommit rows that does not include dumpster-specific data using drop_na function. The last row contains grand total will also be excluded by using filter function filters all rows except for the last row. Lastly, round the number of sports balls to the nearest integer and converts the result to an integer variable.
 ```{r}
 Mr_trash_wheel = 
   readxl::read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",skip = 1,sheet=1,range = cellranger::cell_cols("A:N"))  %>%
@@ -149,12 +149,73 @@ The total number of sports balls collected by Mr. Trash Wheel in 2020 is ```r su
 
 
 # Problem 3
-First, read the dataset. Then separate the mon variable into variables year month and day. As instructed, these variables need to be in integers. Therefore, use mutate function to convert all values in the variables into integers. After that, convert month into month name using moth.abb function in r. Then, create a president variable 
+1. Read the dataset 
+2. Clean the names. 
+3. Separate the mon variable into variables year month and day.
+4. As instructed, these variables need to be in integers. Therefore, use mutate function to convert all values in the variables into integers.
+5. After that, convert month into month name using moth.abb function in r. 
+6. Then, create a president variable containing a classification of 'dem' or 'goz'. If prez_dem==1, the president is democratic, otherwise the president is republican  and must have prez_dem==1. Therefore, I can use ifelse function to check if presidence is gop or dem.  
+7. Follows the last step, I remove the columns of prez_dem and prez_gop using select function. 
+8. Also remove the day variable in the last step.
+
 ```{r}
-pols_month = read_csv("./data/fivethirtyeight_datasets/pols-month.csv") %>% 
+pols_month = read_csv("./data/fivethirtyeight_datasets/pols-month.csv",show_col_types = FALSE) %>% 
   janitor::clean_names() %>%
   separate(mon,c('year','month','day'),sep='-') %>%
   mutate(year = as.integer(year), month = as.integer(month), day = as.integer(day)) %>%
-  mutate(month = month.abb[month]) 
+  mutate(month = month.abb[month]) %>%
+  mutate(president = ifelse(prez_dem==1,'dem','gop')) %>%
+  select(-prez_dem,-prez_gop) %>%
+  select(-day)
+head(pols_month)
 ```
+
+Now move on to cleaning the data in snp.csv with similar procedure:
+1. Read the data
+2. Clean variable name
+3. Seperate date into month day year
+4. Get into integer values
+5. If year is smaller than 22, it means year is from 2000 to 2022, thus, add 2000 to the year value. If it is bigger than 22, i.e. 50, it means it is year 1950. Hence add 1900 if year is bigger than 22. Use ifelse function to do so
+6. Get month into month name
+7. Get rid of column of day
+8. Organize so that year and month are leading columns
+
+```{r}
+snp = read_csv("./data/fivethirtyeight_datasets/snp.csv",show_col_types = FALSE) %>% 
+  janitor::clean_names() %>%
+  separate(date,c('month','day','year'),sep='/') %>%
+  mutate(year = as.integer(year), month = as.integer(month), day = as.integer(day)) %>%
+  mutate(year = ifelse(year<22,year+2000,year+1900))%>%
+  mutate(month = month.abb[month]) %>%
+  select(-day)%>%
+  select(year, month, everything())
+head(snp)
+```
+
+For unemployment data:
+The unemployment data has months in seperate columns with respect to years. It needs to be convert into long format:
+1. load the data
+2. All the data name are in desired form but need to convert Year to lower case year
+3. Convert into long format
+```{r}
+unemployment = read_csv("./data/fivethirtyeight_datasets/unemployment.csv",show_col_types = FALSE) %>%
+  select(year = Year, everything())%>%
+  pivot_longer(Jan:Dec,names_to = "month", values_to = "unemployment")
+```
+
+Now join the snp into pols. So pols are the dataframe that need to contain all the values. Then join unemployment into pols_snp, so pols_snp contains all the values. 
+```{r}
+pols_snp = left_join(pols_month,snp,by = c("year", "month"))
+pols_snp_unemployment = left_join(pols_snp,unemployment,by = c("year", "month"))
+head(pols_snp_unemployment)
+```
+
+Dataset pols_month contains all the information related to whether president was republican or democratic. It also contains the number of governors, senators and representatives in each party. The total dimension is ```r nrow(pols_month)``` with ```r ncol(pols_month)``` variables after tidying data. The range of year is from ```r min(pols_month$year)``` to ```r max(pols_month$year)```.  
+
+snp, on the other hand, contains the closing values of stock market index on the association date. The total dimension for snp is ```r nrow(snp)``` and there are only ```r ncol(snp)``` variables after tidying data, including year and month. The values of stock market index ranging from year ```r min(snp$year)``` to ```r max(snp$year)```.  
+
+Unemployment contains the unemployment rate with respect to different months in different years, ranging from year ```r min(unemployment$year)``` to ```r max(unemployment$year)```. There are ```r nrow(unemployment)``` number of data and ```r ncol(unemployment)``` of variables including year and month.
+
+Now the merged dataset includes all three datasets, namely pols_month, snp and unemployment. The resulting data has the same dimension as pols_month data but with a wider range of variables. It has a total of ```r ncol(pols_snp_unemployment)``` variables, namely year and month as the key and 6 measurement of number of governors, senators and representatives with respect to each party, 1 variable of president measuring whether the president from democrative or republican, closing values of stock market index and unemployment. Although with some missing value, the year is from ```r min(pols_snp_unemployment$year)``` to ```r max(pols_snp_unemployment$year)```.
+
 
