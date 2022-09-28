@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+data/fivethirtyeight_datasets.zip
+data/__MACOSX/
