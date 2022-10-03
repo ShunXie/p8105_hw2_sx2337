@@ -82,22 +82,24 @@ pivot_longer(NYC_transit_adpt,
 reform_NYC_transit
 ```
 
-To answer the question of How many distinct stations serve the A train, I need to first filter the stations that serve A train and then return all the distinct stations by distinct function. Lastly, get the number by nrow()
+To answer the question of How many distinct stations serve the A train, I need to first filter the stations that serve A train and then return all the distinct stations by distinct function. Lastly, get the number by nrow(). Also I print out all the combinations in distinct_station_A dataframe.
 
 ```{r}
 distinct_station_A = filter(reform_NYC_transit,route_name=='A') %>%
   distinct( line,station_name,.keep_all=TRUE) 
 
 print(nrow(distinct_station_A))
+
+distinct_station_A
 ```
-There are 60 distinct stations serve the A train. 
+There are 60 distinct stations serve the A train.  
 
 ```{r}
-num_ADA_distinct_station_A = filter(distinct_station_A,ada=='TRUE') %>%
-  nrow()
-print(num_ADA_distinct_station_A)
+ADA_distinct_station_A = filter(distinct_station_A,ada=='TRUE')
+ADA_distinct_station_A
+print(nrow(ADA_distinct_station_A))
 ```
-By filtering all ada compliant from the distinct stations serve the A train and return the number by using nrow, there are 17 station are ADA compliant.
+By filtering all ada compliant from the distinct stations serve the A train and return the number by using nrow, there are 17 station are ADA compliant. All stored in ADA_distinct_station_A dataframe
 
 
 
@@ -112,7 +114,7 @@ Mr_trash_wheel =
   filter(row_number()!=n())%>%
   mutate(sports_balls = as.integer(sports_balls))
   
-head(Mr_trash_wheel)
+Mr_trash_wheel
 ```
 
 
@@ -127,7 +129,7 @@ Prof_trash_wheel =
   filter(row_number()!=n())%>%
   mutate(sports_balls = as.integer(sports_balls))
   
-head(Prof_trash_wheel)
+Prof_trash_wheel
 ```
 
 First, add two columns specifying the dataset is Mr or Prof. Then join two dataframes vertically using rbind:
@@ -167,7 +169,7 @@ pols_month = read_csv("./data/fivethirtyeight_datasets/pols-month.csv",show_col_
   mutate(president = ifelse(prez_dem==1,'dem','gop')) %>%
   select(-prez_dem,-prez_gop) %>%
   select(-day)
-head(pols_month)
+pols_month
 ```
 
 Now move on to cleaning the data in snp.csv with similar procedure:
@@ -207,7 +209,7 @@ Now join the snp into pols. So pols are the dataframe that need to contain all t
 ```{r}
 pols_snp = left_join(pols_month,snp,by = c("year", "month"))
 pols_snp_unemployment = left_join(pols_snp,unemployment,by = c("year", "month"))
-head(pols_snp_unemployment)
+pols_snp_unemployment
 ```
 
 Dataset pols_month contains all the information related to whether president was republican or democratic. It also contains the number of governors, senators and representatives in each party. The total dimension is ```r nrow(pols_month)``` with ```r ncol(pols_month)``` variables after tidying data. The range of year is from ```r min(pols_month$year)``` to ```r max(pols_month$year)```.  

@@ -482,20 +482,55 @@ reform_NYC_transit</code></pre>
 <p>To answer the question of How many distinct stations serve the A
 train, I need to first filter the stations that serve A train and then
 return all the distinct stations by distinct function. Lastly, get the
-number by nrow()</p>
+number by nrow(). Also I print out all the combinations in
+distinct_station_A dataframe.</p>
 <pre class="r"><code>distinct_station_A = filter(reform_NYC_transit,route_name==&#39;A&#39;) %&gt;%
   distinct( line,station_name,.keep_all=TRUE) 
 
 print(nrow(distinct_station_A))</code></pre>
 <pre><code>## [1] 60</code></pre>
+<pre class="r"><code>distinct_station_A</code></pre>
+<pre><code>## # A tibble: 60 × 10
+##   line       stati…¹ stati…² stati…³ entra…⁴ entry vending ada   route…⁵ route…⁶
+##   &lt;chr&gt;      &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;lgl&gt; &lt;chr&gt;   &lt;lgl&gt; &lt;chr&gt;   &lt;chr&gt;  
+## 1 42nd St S… Times …    40.8   -74.0 Stair   TRUE  YES     FALSE route1  A      
+## 2 8 Avenue   125th …    40.8   -74.0 Stair   TRUE  YES     FALSE route1  A      
+## 3 8 Avenue   145th …    40.8   -73.9 Stair   TRUE  YES     FALSE route1  A      
+## 4 8 Avenue   14th St    40.7   -74.0 Easeme… TRUE  YES     TRUE  route1  A      
+## 5 8 Avenue   168th …    40.8   -73.9 Stair   TRUE  YES     TRUE  route1  A      
+## # … with 55 more rows, and abbreviated variable names ¹​station_name,
+## #   ²​station_latitude, ³​station_longitude, ⁴​entrance_type, ⁵​route_number,
+## #   ⁶​route_name</code></pre>
 <p>There are 60 distinct stations serve the A train.</p>
-<pre class="r"><code>num_ADA_distinct_station_A = filter(distinct_station_A,ada==&#39;TRUE&#39;) %&gt;%
-  nrow()
-print(num_ADA_distinct_station_A)</code></pre>
+<pre class="r"><code>ADA_distinct_station_A = filter(distinct_station_A,ada==&#39;TRUE&#39;)
+ADA_distinct_station_A</code></pre>
+<pre><code>## # A tibble: 17 × 10
+##    line      stati…¹ stati…² stati…³ entra…⁴ entry vending ada   route…⁵ route…⁶
+##    &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;lgl&gt; &lt;chr&gt;   &lt;lgl&gt; &lt;chr&gt;   &lt;chr&gt;  
+##  1 8 Avenue  14th St    40.7   -74.0 Easeme… TRUE  YES     TRUE  route1  A      
+##  2 8 Avenue  168th …    40.8   -73.9 Stair   TRUE  YES     TRUE  route1  A      
+##  3 8 Avenue  175th …    40.8   -73.9 Elevat… TRUE  YES     TRUE  route1  A      
+##  4 8 Avenue  34th St    40.8   -74.0 Elevat… TRUE  YES     TRUE  route1  A      
+##  5 8 Avenue  42nd St    40.8   -74.0 Easeme… TRUE  YES     TRUE  route1  A      
+##  6 8 Avenue  59th St    40.8   -74.0 Easeme… TRUE  YES     TRUE  route1  A      
+##  7 8 Avenue  Inwood…    40.9   -73.9 Elevat… TRUE  YES     TRUE  route1  A      
+##  8 8 Avenue  West 4…    40.7   -74.0 Elevat… TRUE  YES     TRUE  route1  A      
+##  9 8 Avenue  World …    40.7   -74.0 Stair   TRUE  YES     TRUE  route1  A      
+## 10 Broadway  Times …    40.8   -74.0 Stair   TRUE  YES     TRUE  route1  A      
+## 11 Broadway… 59th S…    40.8   -74.0 Stair   TRUE  YES     TRUE  route1  A      
+## 12 Broadway… Times …    40.8   -74.0 Easeme… TRUE  YES     TRUE  route1  A      
+## 13 Canarsie  8th Av     40.7   -74.0 Stair   TRUE  YES     TRUE  route1  A      
+## 14 Franklin  Frankl…    40.7   -74.0 Door    TRUE  YES     TRUE  route1  A      
+## 15 Fulton    Euclid…    40.7   -73.9 Elevat… TRUE  YES     TRUE  route1  A      
+## 16 Fulton    Frankl…    40.7   -74.0 Stair   TRUE  YES     TRUE  route1  A      
+## 17 Rockaway  Howard…    40.7   -73.8 Elevat… TRUE  YES     TRUE  route1  A      
+## # … with abbreviated variable names ¹​station_name, ²​station_latitude,
+## #   ³​station_longitude, ⁴​entrance_type, ⁵​route_number, ⁶​route_name</code></pre>
+<pre class="r"><code>print(nrow(ADA_distinct_station_A))</code></pre>
 <pre><code>## [1] 17</code></pre>
 <p>By filtering all ada compliant from the distinct stations serve the A
 train and return the number by using nrow, there are 17 station are ADA
-compliant.</p>
+compliant. All stored in ADA_distinct_station_A dataframe</p>
 </div>
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
@@ -517,8 +552,8 @@ integer variable.</p>
   filter(row_number()!=n())%&gt;%
   mutate(sports_balls = as.integer(sports_balls))
   
-head(Mr_trash_wheel)</code></pre>
-<pre><code>## # A tibble: 6 × 14
+Mr_trash_wheel</code></pre>
+<pre><code>## # A tibble: 453 × 14
 ##   dumpster weight volume month  year date                plast…¹ polys…² cigar…³
 ##   &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dttm&gt;                &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 1          4.31     18 May    2014 2014-05-16 00:00:00    1450    1820  126000
@@ -526,10 +561,10 @@ head(Mr_trash_wheel)</code></pre>
 ## 3 3          3.45     15 May    2014 2014-05-16 00:00:00    2450    3100  105000
 ## 4 4          3.1      15 May    2014 2014-05-17 00:00:00    2380    2730  100000
 ## 5 5          4.06     18 May    2014 2014-05-17 00:00:00     980     870  120000
-## 6 6          2.71     13 May    2014 2014-05-20 00:00:00    1430    2140   90000
-## # … with 5 more variables: glass_bottles &lt;dbl&gt;, grocery_bags &lt;dbl&gt;,
-## #   chip_bags &lt;dbl&gt;, sports_balls &lt;int&gt;, homes_powered &lt;dbl&gt;, and abbreviated
-## #   variable names ¹​plastic_bottles, ²​polystyrene, ³​cigarette_butts</code></pre>
+## # … with 448 more rows, 5 more variables: glass_bottles &lt;dbl&gt;,
+## #   grocery_bags &lt;dbl&gt;, chip_bags &lt;dbl&gt;, sports_balls &lt;int&gt;,
+## #   homes_powered &lt;dbl&gt;, and abbreviated variable names ¹​plastic_bottles,
+## #   ²​polystyrene, ³​cigarette_butts</code></pre>
 <p>Now do the similar process to Professor Trash Wheel.</p>
 <pre class="r"><code>Prof_trash_wheel = 
   readxl::read_excel(&quot;./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx&quot;,skip = 1,sheet=2,range = cellranger::cell_cols(&quot;A:N&quot;))  %&gt;%
@@ -539,8 +574,8 @@ head(Mr_trash_wheel)</code></pre>
   filter(row_number()!=n())%&gt;%
   mutate(sports_balls = as.integer(sports_balls))
   
-head(Prof_trash_wheel)</code></pre>
-<pre><code>## # A tibble: 6 × 14
+Prof_trash_wheel</code></pre>
+<pre><code>## # A tibble: 70 × 14
 ##   dumpster weight volume month  year date                plast…¹ polys…² cigar…³
 ##      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dttm&gt;                &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
 ## 1        1   1.79     15 Janu…  2017 2017-01-02 00:00:00    1950    6080   19700
@@ -548,10 +583,10 @@ head(Prof_trash_wheel)</code></pre>
 ## 3        3   2.32     18 Febr…  2017 2017-02-26 00:00:00    8350    9210   12000
 ## 4        4   3.72     15 Febr…  2017 2017-02-26 00:00:00    8590    1030   13000
 ## 5        5   1.45     15 Febr…  2017 2017-02-28 00:00:00    7830    9950   16000
-## 6        6   1.71     15 March  2017 2017-03-30 00:00:00    8210   10340   14000
-## # … with 5 more variables: glass_bottles &lt;dbl&gt;, grocery_bags &lt;dbl&gt;,
-## #   chip_bags &lt;dbl&gt;, sports_balls &lt;int&gt;, homes_powered &lt;dbl&gt;, and abbreviated
-## #   variable names ¹​plastic_bottles, ²​polystyrene, ³​cigarette_butts</code></pre>
+## # … with 65 more rows, 5 more variables: glass_bottles &lt;dbl&gt;,
+## #   grocery_bags &lt;dbl&gt;, chip_bags &lt;dbl&gt;, sports_balls &lt;int&gt;,
+## #   homes_powered &lt;dbl&gt;, and abbreviated variable names ¹​plastic_bottles,
+## #   ²​polystyrene, ³​cigarette_butts</code></pre>
 <p>First, add two columns specifying the dataset is Mr or Prof. Then
 join two dataframes vertically using rbind:</p>
 <pre class="r"><code>Mr_trash_wheel = mutate(Mr_trash_wheel, Mr_or_prof = &#39;Mr&#39;)
@@ -606,8 +641,8 @@ using select function.</li>
   mutate(president = ifelse(prez_dem==1,&#39;dem&#39;,&#39;gop&#39;)) %&gt;%
   select(-prez_dem,-prez_gop) %&gt;%
   select(-day)
-head(pols_month)</code></pre>
-<pre><code>## # A tibble: 6 × 9
+pols_month</code></pre>
+<pre><code>## # A tibble: 822 × 9
 ##    year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem president
 ##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;    
 ## 1  1947 Jan        23      51     253      23      45     198 dem      
@@ -615,7 +650,7 @@ head(pols_month)</code></pre>
 ## 3  1947 Mar        23      51     253      23      45     198 dem      
 ## 4  1947 Apr        23      51     253      23      45     198 dem      
 ## 5  1947 May        23      51     253      23      45     198 dem      
-## 6  1947 Jun        23      51     253      23      45     198 dem</code></pre>
+## # … with 817 more rows</code></pre>
 <p>Now move on to cleaning the data in snp.csv with similar procedure:
 1. Read the data 2. Clean variable name 3. Seperate date into month day
 year 4. Get into integer values 5. If year is smaller than 22, it means
@@ -654,8 +689,8 @@ contain all the values. Then join unemployment into pols_snp, so
 pols_snp contains all the values.</p>
 <pre class="r"><code>pols_snp = left_join(pols_month,snp,by = c(&quot;year&quot;, &quot;month&quot;))
 pols_snp_unemployment = left_join(pols_snp,unemployment,by = c(&quot;year&quot;, &quot;month&quot;))
-head(pols_snp_unemployment)</code></pre>
-<pre><code>## # A tibble: 6 × 11
+pols_snp_unemployment</code></pre>
+<pre><code>## # A tibble: 822 × 11
 ##    year month gov_gop sen_gop rep_gop gov_dem sen_dem rep_dem president close
 ##   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;
 ## 1  1947 Jan        23      51     253      23      45     198 dem          NA
@@ -663,8 +698,7 @@ head(pols_snp_unemployment)</code></pre>
 ## 3  1947 Mar        23      51     253      23      45     198 dem          NA
 ## 4  1947 Apr        23      51     253      23      45     198 dem          NA
 ## 5  1947 May        23      51     253      23      45     198 dem          NA
-## 6  1947 Jun        23      51     253      23      45     198 dem          NA
-## # … with 1 more variable: unemployment &lt;dbl&gt;</code></pre>
+## # … with 817 more rows, and 1 more variable: unemployment &lt;dbl&gt;</code></pre>
 <p>Dataset pols_month contains all the information related to whether
 president was republican or democratic. It also contains the number of
 governors, senators and representatives in each party. The total
