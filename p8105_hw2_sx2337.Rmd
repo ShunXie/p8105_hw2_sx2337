@@ -104,45 +104,46 @@ By filtering all ada compliant from the distinct stations serve the A train and 
 
 
 # Problem 2
-First, load the data. The first line of the data is a logo, in which need to skip it. Also exclude the last several columns by specifying the columns that need to be included in the range argument in read_excel. After clean the names, change the variable name of weight_tons to weight and Volume_cubic_yards to volume. After that, ommit rows that does not include dumpster-specific data using drop_na function. The last row contains grand total will also be excluded by using filter function filters all rows except for the last row. Lastly, round the number of sports balls to the nearest integer and converts the result to an integer variable.
+First, load the data. The first line of the data is a logo, in which need to skip it. Also exclude the last several columns by specifying the columns that need to be included in the range argument in read_excel. After clean the names, change the variable name of weight_tons to weight and Volume_cubic_yards to volume. After that, ommit rows that does not include dumpster-specific data using drop_na function. Lastly, round the number of sports balls to the nearest integer and converts the result to an integer variable.
 ```{r}
 Mr_trash_wheel = 
-  readxl::read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",skip = 1,sheet=1,range = cellranger::cell_cols("A:N"))  %>%
+  readxl::read_excel("./data/Trash Wheel Collection Data.xlsx",skip = 1,sheet=1,range = cellranger::cell_cols("A:N"))  %>%
   janitor::clean_names() %>%
   select(dumpster=dumpster, weight = weight_tons,volume = volume_cubic_yards,everything())%>%
   drop_na(dumpster) %>%
-  filter(row_number()!=n())%>%
   mutate(sports_balls = as.integer(sports_balls))
   
 Mr_trash_wheel
 ```
 
 
-Now do the similar process to Professor Trash Wheel.
+Now do the similar process to Professor Trash Wheel. There is no sports balls in the dataset so do not need to consider as.integer(sports_balls).
 
 ```{r}
 Prof_trash_wheel = 
-  readxl::read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",skip = 1,sheet=2,range = cellranger::cell_cols("A:N"))  %>%
+  readxl::read_excel("./data/Trash Wheel Collection Data.xlsx",skip = 1,sheet=2,range = cellranger::cell_cols("A:M"))  %>%
   janitor::clean_names() %>%
   select(dumpster=dumpster, weight = weight_tons,volume = volume_cubic_yards,everything())%>%
-  drop_na(dumpster) %>%
-  filter(row_number()!=n())%>%
-  mutate(sports_balls = as.integer(sports_balls))
+  drop_na(dumpster)
   
 Prof_trash_wheel
 ```
 
-First, add two columns specifying the dataset is Mr or Prof. Then join two dataframes vertically using rbind:
+In the new dataset, there is no sportsball. Hence need to create a column named as sportsball. Then, add a column specifying the dataset is Mr or Prof before joining two dataframes vertically using rbind:
 
 ```{r}
+Prof_trash_wheel$sports_balls=NA
 Mr_trash_wheel = mutate(Mr_trash_wheel, Mr_or_prof = 'Mr')
 Prof_trash_wheel = mutate(Prof_trash_wheel, Mr_or_prof = 'Prof')
 merged_df = rbind(Mr_trash_wheel,Prof_trash_wheel)
 ```
 
-The data has a total of ```r nrow(merged_df)``` number of time that trash is collected and dumped into a dumpster after combining Mr_trash_wheel and Prof_trash_wheel. The key variables are the weight of dumpster measuring in tons and the average of each dumpster weights ```r mean(merged_df$weight)```. For the data collected by Mr Trash wheel, the average weight is ```r mean(filter(merged_df,Mr_or_prof=='Mr')$weight)``` tons whereas Prof Trash wheel has an average of ```r mean(filter(merged_df,Mr_or_prof=='Prof')$weight)``` tons. Another important factor is the volume of dumpsters, measuring in cubic yards. The average volume of each dumpster is  ```r mean(merged_df$volume)```. For the data collected by Mr Trash wheel, the average volume is ```r mean(filter(merged_df,Mr_or_prof=='Mr')$volume)``` cubic yards whereas Prof Trash wheel has an average of ```r mean(filter(merged_df,Mr_or_prof=='Prof')$volume)``` cubic yards. 
+The data has a total of ```r nrow(merged_df)``` number of time that trash is collected and dumped into a dumpster after combining Mr_trash_wheel and Prof_trash_wheel. Out of all dataset, Mr. trash wheel contains ```r nrow(Mr_trash_wheel)``` number of data and Professor trash wheel contains ```r nrow(Prof_trash_wheel)``` number of data. 
 
-The dataset also measures number of plastic bottles, cigarette butts, glass bottles, grocery bags, chip bags and sports balls. The average of the above variables is: ```r mean(merged_df$plastic_bottles)```, ```r mean(merged_df$cigarette_butts)```, ```r mean(merged_df$glass_bottles)```, ```r mean(merged_df$grocery_bags)```, ```r mean(merged_df$chip_bags)```, ```r mean(merged_df$sports_balls)``` respectively. 
+The key variables are the weight of dumpster measuring in tons and the total of all dumpsters weight ```r sum(merged_df$weight)``` tons. For the data collected by Mr Trash wheel, the total weight is ```r sum(filter(merged_df,Mr_or_prof=='Mr')$weight)``` tons whereas Prof Trash wheel has a sum of ```r sum(filter(merged_df,Mr_or_prof=='Prof')$weight)``` tons. Another important factor is the volume of dumpsters, measuring in cubic yards. The total volume of all dumpsters is  ```r sum(merged_df$volume)``` cubic yards. For the data collected by Mr Trash wheel, the total volume is ```r sum(filter(merged_df,Mr_or_prof=='Mr')$volume)``` cubic yards whereas Prof Trash wheel has a total of ```r sum(filter(merged_df,Mr_or_prof=='Prof')$volume)``` cubic yards. 
+
+The dataset also measures number of plastic bottles, cigarette butts, glass bottles, grocery bags and chip bags collected in dumpster. The total number of the above variables is: ```r sum(merged_df$plastic_bottles)```, ```r sum(merged_df$cigarette_butts)```, ```r sum(merged_df$glass_bottles)```, ```r sum(merged_df$grocery_bags)```, ```r sum(merged_df$chip_bags)``` respectively. The number of sports ball, however, is only contained in Mr. Trash Wheel dataset, and there are a total number of  ```r sum(filter(merged_df,Mr_or_prof=='Mr', year == 2020)$sports_balls)``` number of sports balls collected by Mr. Trash Wheel. 
+
 
 
 The total weight of trash collected by Professor Trash Wheel is ```r sum(filter(merged_df,Mr_or_prof=='Prof')$weight)``` tons. 
