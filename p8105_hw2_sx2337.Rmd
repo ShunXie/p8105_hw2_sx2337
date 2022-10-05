@@ -136,9 +136,10 @@ Prof_trash_wheel$sports_balls=NA
 Mr_trash_wheel = mutate(Mr_trash_wheel, Mr_or_prof = 'Mr')
 Prof_trash_wheel = mutate(Prof_trash_wheel, Mr_or_prof = 'Prof')
 merged_df = rbind(Mr_trash_wheel,Prof_trash_wheel)
+merged_df
 ```
 
-The data has a total of ```r nrow(merged_df)``` number of time that trash is collected and dumped into a dumpster after combining Mr_trash_wheel and Prof_trash_wheel. Out of all dataset, Mr. trash wheel contains ```r nrow(Mr_trash_wheel)``` number of data and Professor trash wheel contains ```r nrow(Prof_trash_wheel)``` number of data. 
+The data has a total of ```r nrow(merged_df)``` number of time that trash is collected and dumped into a dumpster after combining Mr_trash_wheel and Prof_trash_wheel. Out of all dataset, Mr. trash wheel contains ```r nrow(Mr_trash_wheel)``` number of data and Professor trash wheel contains ```r nrow(Prof_trash_wheel)``` number of data. The year of the merged data ranges from ```r min(merged_df$year)``` to ```r max(merged_df$year)```. 
 
 The key variables are the weight of dumpster measuring in tons and the total of all dumpsters weight ```r sum(merged_df$weight)``` tons. For the data collected by Mr Trash wheel, the total weight is ```r sum(filter(merged_df,Mr_or_prof=='Mr')$weight)``` tons whereas Prof Trash wheel has a sum of ```r sum(filter(merged_df,Mr_or_prof=='Prof')$weight)``` tons. Another important factor is the volume of dumpsters, measuring in cubic yards. The total volume of all dumpsters is  ```r sum(merged_df$volume)``` cubic yards. For the data collected by Mr Trash wheel, the total volume is ```r sum(filter(merged_df,Mr_or_prof=='Mr')$volume)``` cubic yards whereas Prof Trash wheel has a total of ```r sum(filter(merged_df,Mr_or_prof=='Prof')$volume)``` cubic yards. 
 
